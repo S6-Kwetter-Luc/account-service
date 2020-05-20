@@ -1,6 +1,5 @@
-﻿﻿using System.Threading.Tasks;
-using account_service.Exceptions;
-using account_service.Helpers;
+﻿using System;
+using System.Threading.Tasks;
 using account_service.Models;
 using account_service.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -22,9 +21,9 @@ namespace account_service.Controllers
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public async Task<IActionResult> Authenticate([FromBody] AuthenticateModel view)
+        public async Task<IActionResult> Authenticate([FromBody] AuthenticateModel model)
         {
-            var user = await _userService.Authenticate(view.Email, view.Password);
+            var user = await _userService.Authenticate(model.Email, model.Password);
 
             if (user == null)
                 return BadRequest(new {message = "Username or password is incorrect"});
@@ -34,21 +33,36 @@ namespace account_service.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public IActionResult Register([FromBody] RegisterModel view)
+        public IActionResult Register([FromBody] RegisterModel model)
         {
             try
             {
                 // create user
-                _userService.Create(view.Name, view.Email, view.Password);
+                _userService.Create(model.Name, model.Email, model.Username, model.Password);
                 return Ok();
             }
-            catch (AppException ex)
+            catch (Exception ex)
             {
                 // return error message if there was an exception
                 return BadRequest(new {message = ex.Message});
             }
         }
 
+        [AllowAnonymous]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUser(Guid id)
+        {
+            try
+            {
+                return Ok(await _userService.GetUserByGuid(id));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new {message = ex.Message});
+            }
+        }
+
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

@@ -45,13 +45,13 @@ namespace account_service_test.Controllers
             var userService = new Mock<IUserService>();
             _controller = new UsersController(userService.Object);
 
-            userService.Setup(p => p.Create("test1", "test@test.nl", "testtest"))
-                .Throws(new AppException("Something went wrong"));
+            userService.Setup(p => p.Create("test1", "test@test.nl","test1", "testtest"))
+                .Throws<AlreadyInUseException>();
 
             var result = _controller.Register(new RegisterModel()
-                {Name = "test1", Email = "test@test.nl", Password = "testtest"});
+                {Name = "test1", Email = "test@test.nl", Username="test1", Password = "testtest"});
 
-            _testOutputHelper.WriteLine(result.ToString());
+            // _testOutputHelper.WriteLine(result.ToString());
             Assert.IsType<BadRequestObjectResult>(result);
         }
 

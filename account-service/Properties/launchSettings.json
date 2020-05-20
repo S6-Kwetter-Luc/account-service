@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "auth_service": {
+    "account_service": {
       "commandName": "Project",
       "launchBrowser": false,
       "launchUrl": "weatherforecast",
