@@ -17,7 +17,10 @@ namespace account_service.Repositories
         /// </summary>
         /// <param name="email">the email address to be searched for</param>
         /// <returns>User with the correct email address</returns>
-        Task<User> Get(string email);
+        Task<User> GetByEmail(string email);
+
+        Task<User> GetByUsername(string username);
+        Task<User> GetByGuid(Guid id);
         /// <summary>
         /// <param name="id">Guid to search for</para
         /// Gets a single user by their Guid

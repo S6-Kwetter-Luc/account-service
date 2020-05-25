@@ -1,4 +1,3 @@
-using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -114,13 +113,14 @@ public class Startup
 
             // app.UseHttpsRedirection();
 
-            app.UseRouting();
-
             // global cors policy
             app.UseCors(x => x
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
-                .AllowAnyHeader());
+                .AllowAnyHeader()
+            );
+
+            app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();

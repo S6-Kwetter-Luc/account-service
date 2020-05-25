@@ -40,7 +40,7 @@ namespace account_service_test.Services
             var hashedPassword = await hasher.HashPassword("testtest", salt);
             var guid = new Guid();
 
-            repository.Setup(r => r.Get("test@test.nl")).Returns(async () => new User()
+            repository.Setup(r => r.GetByEmail("test@test.nl")).Returns(async () => new User()
             {
                 Id = guid,
                 Email = "test@test.nl",
@@ -87,7 +87,7 @@ namespace account_service_test.Services
             var hashedPassword = await hasher.HashPassword("testtest", salt);
             var guid = new Guid();
 
-            repository.Setup(r => r.Get("test@test.nl")).Returns(async () => new User()
+            repository.Setup(r => r.GetByEmail("test@test.nl")).Returns(async () => new User()
             {
                 Id = guid,
                 Email = "test@test.nl",
@@ -104,9 +104,9 @@ namespace account_service_test.Services
             _service = new UserService(repository.Object, hasher, tokenGenerator.Object);
 
             Exception ex =
-                await Assert.ThrowsAsync<AppException>(() => _service.Authenticate("test@test.nl", "wrongpassword"));
+                await Assert.ThrowsAsync<UserByEmailOrPasswordNotFoundException>(() => _service.Authenticate("test@test.nl", "wrongpassword"));
 
-            Assert.Equal("The password is not correct", ex.Message);
+            Assert.Equal("A user with this email or password combination does not exist", ex.Message);
         }
 
         [Fact]
@@ -119,9 +119,9 @@ namespace account_service_test.Services
             _service = new UserService(repository.Object, hasher, tokenGenerator.Object);
 
             Exception ex =
-                await Assert.ThrowsAsync<AppException>(() => _service.Authenticate("test@test.nl", "testtest"));
+                await Assert.ThrowsAsync<UserByEmailOrPasswordNotFoundException>(() => _service.Authenticate("test@test.nl", "testtest"));
 
-            Assert.Equal("There is no user with this email", ex.Message);
+            Assert.Equal("A user with this email or password combination does not exist", ex.Message);
         }
 
         #endregion
@@ -167,12 +167,13 @@ namespace account_service_test.Services
 
             _service = new UserService(repository.Object, _hasher.Object, tokenGenerator.Object);
 
-            var result = await _service.Create("test1", "test@test.nl", "testtest");
+            var result = await _service.Create("test1", "test@test.nl", "test1", "testtest");
 
             var expectedUser = new User()
             {
                 Id = guid,
                 Email = "test@test.nl",
+                Username = "test1",
                 Name = "test1",
                 Salt = null,
                 Password = null,
@@ -181,8 +182,8 @@ namespace account_service_test.Services
                 OauthSubject = null
             };
 
-            _testOutputHelper.WriteLine(result.ToJson());
-            _testOutputHelper.WriteLine(expectedUser.ToJson());
+            // _testOutputHelper.WriteLine(result.ToJson());
+            // _testOutputHelper.WriteLine(expectedUser.ToJson());
 
             Assert.Equal(expectedUser.ToJson(), result.ToJson());
         }
@@ -201,7 +202,7 @@ namespace account_service_test.Services
             var hashedPassword = await hasher.HashPassword(Email, salt);
             var guid = new Guid();
 
-            repository.Setup(r => r.Get(Email)).Returns(async () => new User()
+            repository.Setup(r => r.GetByEmail(Email)).Returns(async () => new User()
             {
                 Id = guid,
                 Email = "test@test.nl",
@@ -215,9 +216,10 @@ namespace account_service_test.Services
 
             _service = new UserService(repository.Object, _hasher.Object, tokenGenerator.Object);
 
-            Exception ex = await Assert.ThrowsAsync<AppException>(() => _service.Create("test1", Email, "testtest"));
+            Exception ex =
+                await Assert.ThrowsAsync<AlreadyInUseException>(() => _service.Create("test1", Email, "test1", "testtest"));
 
-            Assert.Equal("Email \"" + Email + "\" is already being used", ex.Message);
+            Assert.Equal("A user with this email is already registered.", ex.Message);
         }
     }
 }

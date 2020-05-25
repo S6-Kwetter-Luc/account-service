@@ -5,12 +5,7 @@ using account_service.Entities;
 using account_service.Exceptions;
 using account_service.Helpers;
 using account_service.Repositories;
-using account_service.Services;
-using account_service.Entities;
-using account_service.Exceptions;
-using account_service.Helpers;
-using account_service.Repositories;
-using Microsoft.AspNetCore.Mvc;
+
 
 namespace account_service.Services
 {
@@ -52,37 +47,49 @@ namespace account_service.Services
         }
 
         // TODO Custom Exceptions
-        public async Task<User> Authenticate(string viewEmail, string viewPassword)
+        public async Task<User> Authenticate(string email, string password)
         {
-            var user = await _repository.Get(viewEmail);
-            if (user == null) throw new AppException("There is no user with this email");
+            var user = await _repository.GetByEmail(email);
+            if (user == null) throw new UserByEmailOrPasswordNotFoundException("A user with this email or password combination does not exist");
+            // AppException("There is no user with this email");
 
-            if (!await _hasher.VerifyHash(viewPassword, user.Salt, user.Password))
-                throw new AppException("The password is not correct");
+            if (!await _hasher.VerifyHash(password, user.Salt, user.Password))
+                throw new UserByEmailOrPasswordNotFoundException("A user with this email or password combination does not exist");
+            // AppException("The password is not correct");
 
             user.Token = _tokenGenerator.CreateToken(user.Id);
 
             return user.RemovePassword().RemoveSalt();
         }
 
-        public async Task<User> Create(string viewName, string viewEmail, string viewPassword)
+        public async Task<User> Create(string name, string email, string username, string password)
         {
-            var emailuser = await _repository.Get(viewEmail);
-            if (emailuser != null) throw new AppException("Email \"" + viewEmail + "\" is already being used");
+            var emailuser = await _repository.GetByEmail(email.ToLower());
+            if (emailuser != null) throw new AlreadyInUseException("A user with this email is already registered.");
+
+            if (await _repository.GetByUsername(username.ToLower()) != null) throw new AlreadyInUseException("A user with this username is already registered.");
 
             var salt = _hasher.CreateSalt();
-            var password = await _hasher.HashPassword(viewPassword, salt);
+            var _password = await _hasher.HashPassword(password, salt);
             var user = new User()
             {
-                Email = viewEmail,
-                Name = viewName,
+                Email = email.ToLower(),
+                Name = name,
                 Salt = salt,
-                Password = password,
+                Username = username.ToLower(),
+                Password = _password,
                 OauthIssuer = "none",
             };
             await _repository.Create(user);
 
             return user.RemovePassword().RemoveSalt();
+        }
+
+        public async Task<User> GetUserByGuid(Guid id)
+        {
+            var user = await _repository.GetByGuid(id);
+            if (user == null) throw new UserDoesNotExistException();
+            return user;
         }
 
         public async Task<List<User>> GetAll()
