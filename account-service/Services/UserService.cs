@@ -4,7 +4,10 @@ using System.Threading.Tasks;
 using account_service.Entities;
 using account_service.Exceptions;
 using account_service.Helpers;
+using account_service.MQSettings;
 using account_service.Repositories;
+using MessageBroker;
+using Microsoft.Extensions.Options;
 
 
 namespace account_service.Services
@@ -14,12 +17,17 @@ namespace account_service.Services
         private readonly IUserRepository _repository;
         private readonly IHasher _hasher;
         private readonly ITokenGenerator _tokenGenerator;
+        private readonly IMessageQueuePublisher _messageQueuePublisher;
+        private readonly MessageQueueSettings _messageQueueSettings;
 
-        public UserService(IUserRepository repository, IHasher hasher, ITokenGenerator tokenGenerator)
+
+        public UserService(IUserRepository repository, IHasher hasher, ITokenGenerator tokenGenerator, IMessageQueuePublisher messageQueuePublisher, IOptions<MessageQueueSettings> messageQueueSettings)
         {
             _repository = repository;
             _hasher = hasher;
             _tokenGenerator = tokenGenerator;
+            _messageQueuePublisher = messageQueuePublisher;
+            _messageQueueSettings = messageQueueSettings.Value;
         }
 
         public async Task Fill()
@@ -50,11 +58,14 @@ namespace account_service.Services
         public async Task<User> Authenticate(string email, string password)
         {
             var user = await _repository.GetByEmail(email);
-            if (user == null) throw new UserByEmailOrPasswordNotFoundException("A user with this email or password combination does not exist");
+            if (user == null)
+                throw new UserByEmailOrPasswordNotFoundException(
+                    "A user with this email or password combination does not exist");
             // AppException("There is no user with this email");
 
             if (!await _hasher.VerifyHash(password, user.Salt, user.Password))
-                throw new UserByEmailOrPasswordNotFoundException("A user with this email or password combination does not exist");
+                throw new UserByEmailOrPasswordNotFoundException(
+                    "A user with this email or password combination does not exist");
             // AppException("The password is not correct");
 
             user.Token = _tokenGenerator.CreateToken(user.Id);
@@ -67,7 +78,8 @@ namespace account_service.Services
             var emailuser = await _repository.GetByEmail(email.ToLower());
             if (emailuser != null) throw new AlreadyInUseException("A user with this email is already registered.");
 
-            if (await _repository.GetByUsername(username.ToLower()) != null) throw new AlreadyInUseException("A user with this username is already registered.");
+            if (await _repository.GetByUsername(username.ToLower()) != null)
+                throw new AlreadyInUseException("A user with this username is already registered.");
 
             var salt = _hasher.CreateSalt();
             var _password = await _hasher.HashPassword(password, salt);
@@ -80,7 +92,11 @@ namespace account_service.Services
                 Password = _password,
                 OauthIssuer = "none",
             };
+
             await _repository.Create(user);
+
+            await _messageQueuePublisher.PublishMessageAsync(_messageQueueSettings.Exchange, "email-service",
+                "RegisterUser", new {Email = user.Email});
 
             return user.RemovePassword().RemoveSalt();
         }

@@ -19,7 +19,5 @@ namespace account_service.Models
         public string PhoneNumber { get; set; }
 
         public string Bio { get; set; }
-
-
     }
 }

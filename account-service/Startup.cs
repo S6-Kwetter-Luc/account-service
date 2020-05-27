@@ -7,7 +7,9 @@ using account_service.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using account_service.DatastoreSettings;
+using account_service.MQSettings;
 using account_service.Repositories;
+using MessageBroker;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -58,9 +60,14 @@ public class Startup
                 });
             });
 
+            services.Configure<MessageQueueSettings>(Configuration.GetSection("MessageQueueSettings"));
+
+            services.AddMessagePublisher(Configuration["MessageQueueSettings:Uri"]);
+
             services.AddCors();
 
             var appSettingsSection = Configuration.GetSection("AppSettings");
+
             services.Configure<AppSettings>(appSettingsSection);
 
             services.AddAuthentication(x =>
