@@ -100,5 +100,6 @@ jobs:
             ./kube_develop/deployment.yaml
             ./kube_develop/ingress.yaml
             ./kube_develop/service.yaml
+            ./kube_develop/autoscaler.yaml
           images: |
             ${{ secrets.DOCKER_ORGANIZATION }}/${{ secrets.REPOSITORY_NAME }}:${{ github.sha }}
