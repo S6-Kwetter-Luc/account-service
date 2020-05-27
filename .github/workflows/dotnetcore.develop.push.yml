@@ -56,12 +56,14 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: release-artifact
-          path: .
+          path: ./out
+
       - name: Download Dockerfile artifact
         uses: actions/download-artifact@v1
         with:
           name: dockerfile-artifact
           path: .
+
       - name: Deliver Docker image
         env:
           CONTAINER_IMAGE: s6individualproject/${{ secrets.REPOSITORY_NAME }}:${{ github.sha }}
