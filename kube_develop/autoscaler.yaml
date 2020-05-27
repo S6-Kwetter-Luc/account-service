@@ -10,4 +10,4 @@ spec:
     name: account-service
   minReplicas: 2
   maxReplicas: 10
-  targetCPUUtilizationPercentage: 80
+  targetCPUUtilizationPercentage: 75
