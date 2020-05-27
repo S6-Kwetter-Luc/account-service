@@ -34,7 +34,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: release-artifact
-          path: ./out/account-service.dll
+          path: ./out
 
       - name: Upload Dockerfile artifact
         uses: actions/upload-artifact@v1

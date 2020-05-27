@@ -12,23 +12,30 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        -
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1.201
+
       - name: Install dependencies
         run: dotnet restore
+
       - name: Build
         run: dotnet build
+
       - name: Test
         run: dotnet test
+
       - name: Publish
         run: dotnet publish -c Release -o out
+
       - name: Upload release artifact
         uses: actions/upload-artifact@v1
         with:
           name: release-artifact
-          path: ./out/account-service.dll
+          path: ./out
+
       - name: Upload Dockerfile artifact
         uses: actions/upload-artifact@v1
         with:
