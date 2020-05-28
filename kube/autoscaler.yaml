@@ -8,5 +8,5 @@ spec:
     kind: Deployment
     name: account-service
   minReplicas: 2
-  maxReplicas: 100
+  maxReplicas: 20
   targetCPUUtilizationPercentage: 80
