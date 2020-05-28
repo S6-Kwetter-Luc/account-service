@@ -12,7 +12,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        -
+
+      - name: Decrypt the GPG encrypted config files
+        run: gpg --quiet --batch --yes --passphrase ${{ secrets.GPG_PASSPHRASE }}  --output ./account-service/appsettings.json --decrypt ./account-service/appsettings.develop.json.gpg
+
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
