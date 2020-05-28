@@ -70,7 +70,7 @@ jobs:
       - name: Deliver Docker image
         env:
           CONTAINER_IMAGE: s6individualproject/${{ secrets.REPOSITORY_NAME }}:${{ github.sha }}
-          CONTAINER_IMAGE_LATEST: s6individualproject/${{ secrets.REPOSITORY_NAME }}:devlatest
+          CONTAINER_IMAGE_LATEST: s6individualproject/${{ secrets.REPOSITORY_NAME }}:staging
         run: |
           docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
           docker build -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
