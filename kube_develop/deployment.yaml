@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: account-service
-  namespace: kwetter-staging
+#  namespace: kwetter-staging
   labels:
     app: account-service
 spec:
