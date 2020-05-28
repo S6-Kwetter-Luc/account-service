@@ -98,7 +98,7 @@ jobs:
       - name: Deploy Kubernetes with manifests
         uses: azure/k8s-deploy@v1
         with:
-          namespace: kwetter-development
+          namespace: kwetter-production
           manifests: |
             ./kube_develop/autoscaler.yaml
             ./kube_develop/deployment.yaml
