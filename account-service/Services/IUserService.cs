@@ -1,4 +1,5 @@
-﻿﻿using System.Collections.Generic;
+﻿﻿using System;
+ using System.Collections.Generic;
 using System.Threading.Tasks;
 using account_service.Entities;
 
@@ -15,22 +16,25 @@ namespace account_service.Services
         /// <param name="email">Email-address of the user</param>
         /// <param name="password">Password of the user</param>
         /// <returns>Authenticated user</returns>
-        Task<User> Authenticate(string viewEmail, string viewPassword);
+        Task<User> Authenticate(string email, string password);
 
         /// <summary>
         /// Used to create new users
         /// </summary>
-        /// <param name="viewName">Account name</param>
-        /// <param name="viewEmail"></param>
-        /// <param name="viewPassword"></param>
+        /// <param name="name">Account name</param>
+        /// <param name="email"></param>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
         /// <returns>user without password</returns>
-        Task<User> Create(string viewName, string viewEmail, string viewPassword);
+        Task<User> Create(string name, string email, string username, string password);
 
         /// <summary>
         /// Get list of all users
         /// </summary>
         /// <returns>List of all users</returns>
         Task<List<User>> GetAll();
+
+        Task<User> GetUserByGuid(Guid id);
 
         /// <summary>
         /// Add 3 new users if the db is empty

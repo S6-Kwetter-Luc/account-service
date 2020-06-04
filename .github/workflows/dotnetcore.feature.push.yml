@@ -1,24 +1,31 @@
 ﻿name: .NET Core
 
-on: [push]
+on:
+  push:
+    branches: [feature/*]
 
 jobs:
   build:
-    name: build and test on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ubuntu-18.04
+    container:
+      image: mcr.microsoft.com/dotnet/core/sdk:3.1.201-bionic
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Decrypt the GPG encrypted config files
+        run: gpg --quiet --batch --yes --passphrase ${{ secrets.GPG_PASSPHRASE }}  --output ./account-service/appsettings.json --decrypt ./account-service/appsettings.json.gpg
+
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1.201
+
       - name: Install dependencies
         run: dotnet restore
+
       - name: Build
         run: dotnet build --configuration Release --no-restore
+
       - name: Test
         run: dotnet test --no-restore --verbosity normal
