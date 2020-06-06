@@ -511,3 +511,7 @@ healthchecksdb
 MigrationBackup/
 
 # End of https://www.gitignore.io/api/osx,rider,linux,windows,dotnetcore,visualstudio,visualstudiocode
+/account-service/appsettings.json
+/account-service/appsettings.production.json
+/account-service/appsettings.staging.json
+/appsettings proftaak.json

@@ -12,16 +12,17 @@ using Microsoft.Extensions.Options;
 
 namespace account_service.Services
 {
-    public class UserService : IUserService
+    public class AccountService : IAccountService
     {
-        private readonly IUserRepository _repository;
+        private readonly IAccountRepository _repository;
         private readonly IHasher _hasher;
         private readonly ITokenGenerator _tokenGenerator;
         private readonly IMessageQueuePublisher _messageQueuePublisher;
         private readonly MessageQueueSettings _messageQueueSettings;
 
 
-        public UserService(IUserRepository repository, IHasher hasher, ITokenGenerator tokenGenerator, IMessageQueuePublisher messageQueuePublisher, IOptions<MessageQueueSettings> messageQueueSettings)
+        public AccountService(IAccountRepository repository, IHasher hasher, ITokenGenerator tokenGenerator,
+            IMessageQueuePublisher messageQueuePublisher, IOptions<MessageQueueSettings> messageQueueSettings)
         {
             _repository = repository;
             _hasher = hasher;
@@ -35,19 +36,19 @@ namespace account_service.Services
             var list = await _repository.Get();
             if (list.Count != 0) return;
 
-            await _repository.Create(new User()
+            await _repository.Create(new Account()
             {
                 Name = "Test 1",
                 Email = "test1@gmail.com"
             });
 
-            await _repository.Create(new User()
+            await _repository.Create(new Account()
             {
                 Name = "Test 2",
                 Email = "test2@gmail.com"
             });
 
-            await _repository.Create(new User()
+            await _repository.Create(new Account()
             {
                 Name = "Test 3",
                 Email = "test3@gmail.com"
@@ -55,60 +56,68 @@ namespace account_service.Services
         }
 
         // TODO Custom Exceptions
-        public async Task<User> Authenticate(string email, string password)
+        public async Task<Account> Authenticate(string email, string password)
         {
-            var user = await _repository.GetByEmail(email);
-            if (user == null)
-                throw new UserByEmailOrPasswordNotFoundException(
+            var account = await _repository.GetByEmail(email);
+            if (account == null)
+                throw new AccountByEmailOrPasswordNotFoundException(
                     "A user with this email or password combination does not exist");
             // AppException("There is no user with this email");
 
-            if (!await _hasher.VerifyHash(password, user.Salt, user.Password))
-                throw new UserByEmailOrPasswordNotFoundException(
+            if (!await _hasher.VerifyHash(password, account.Salt, account.Password))
+                throw new AccountByEmailOrPasswordNotFoundException(
                     "A user with this email or password combination does not exist");
             // AppException("The password is not correct");
 
-            user.Token = _tokenGenerator.CreateToken(user.Id);
+            account.Token = _tokenGenerator.CreateToken(account.Id);
 
-            return user.RemovePassword().RemoveSalt();
+            return account.RemovePassword().RemoveSalt();
         }
 
-        public async Task<User> Create(string name, string email, string username, string password)
+        public async Task<Account> Create(string name, string email, string username, string password)
         {
-            var emailuser = await _repository.GetByEmail(email.ToLower());
-            if (emailuser != null) throw new AlreadyInUseException("A user with this email is already registered.");
+            var accountByEmail = await _repository.GetByEmail(email.ToLower());
+            if (accountByEmail != null)
+                throw new AlreadyInUseException("A user with this email is already registered.");
 
             if (await _repository.GetByUsername(username.ToLower()) != null)
                 throw new AlreadyInUseException("A user with this username is already registered.");
 
             var salt = _hasher.CreateSalt();
             var _password = await _hasher.HashPassword(password, salt);
-            var user = new User()
+
+            var account = new Account()
             {
                 Email = email.ToLower(),
                 Name = name,
                 Salt = salt,
-                Username = username.ToLower(),
+                Profile = new Profile()
+                {
+                    Username = username.ToLower(),
+                    Created = DateTime.Now,
+                    Followers = new List<User>(),
+                    Following = new List<User>()
+                },
                 Password = _password,
                 OauthIssuer = "none",
             };
 
-            await _repository.Create(user);
+            await _repository.Create(account);
 
             await _messageQueuePublisher.PublishMessageAsync(_messageQueueSettings.Exchange, "email-service",
-                "RegisterUser", new {Email = user.Email});
+                "RegisterUser", new {Email = account.Email});
 
-            return user.RemovePassword().RemoveSalt();
+            return account.RemovePassword().RemoveSalt();
         }
 
-        public async Task<User> GetUserByGuid(Guid id)
+        public async Task<Account> GetUserByGuid(Guid id)
         {
-            var user = await _repository.GetByGuid(id);
-            if (user == null) throw new UserDoesNotExistException();
-            return user;
+            var account = await _repository.GetByGuid(id);
+            if (account == null) throw new AccountDoesNotExistException();
+            return account;
         }
 
-        public async Task<List<User>> GetAll()
+        public async Task<List<Account>> GetAll()
         {
             return await _repository.Get();
         }

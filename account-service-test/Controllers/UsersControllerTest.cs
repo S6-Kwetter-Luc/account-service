@@ -16,7 +16,7 @@ namespace account_service_test.Controllers
     public class UsersControllerTest
     {
         private readonly ITestOutputHelper _testOutputHelper;
-        private UsersController _controller;
+        private AccountController _controller;
         private Hasher _hasher;
 
         public UsersControllerTest(ITestOutputHelper testOutputHelper)
@@ -28,9 +28,9 @@ namespace account_service_test.Controllers
         [Fact]
         public async Task Register_Successful()
         {
-            var userService = new Mock<IUserService>();
+            var userService = new Mock<IAccountService>();
 
-            _controller = new UsersController(userService.Object);
+            _controller = new AccountController(userService.Object);
 
             var result = _controller.Register(new RegisterModel()
                 {Name = "test1", Email = "test@test.nl", Password = "testtest"});
@@ -42,8 +42,8 @@ namespace account_service_test.Controllers
         [Fact]
         public async Task Register_Badresult()
         {
-            var userService = new Mock<IUserService>();
-            _controller = new UsersController(userService.Object);
+            var userService = new Mock<IAccountService>();
+            _controller = new AccountController(userService.Object);
 
             userService.Setup(p => p.Create("test1", "test@test.nl","test1", "testtest"))
                 .Throws<AlreadyInUseException>();
@@ -58,15 +58,15 @@ namespace account_service_test.Controllers
         [Fact]
         public async Task Authenticate_Successful()
         {
-            var userService = new Mock<IUserService>();
-            _controller = new UsersController(userService.Object);
+            var userService = new Mock<IAccountService>();
+            _controller = new AccountController(userService.Object);
 
             var salt = _hasher.CreateSalt();
             var hashedPassword = await _hasher.HashPassword("testtest", salt);
             var guid = new Guid();
 
             userService.Setup(p => p.Authenticate("test@test.nl", "testtest"))
-                .Returns(async () => new User()
+                .Returns(async () => new Account()
                 {
                     Id = guid,
                     Email = "test@test.nl",
@@ -92,8 +92,8 @@ namespace account_service_test.Controllers
         [Fact]
         public async Task Authenticate_Badresult()
         {
-            var userService = new Mock<IUserService>();
-            _controller = new UsersController(userService.Object);
+            var userService = new Mock<IAccountService>();
+            _controller = new AccountController(userService.Object);
 
             var result = await _controller.Authenticate(new AuthenticateModel()
             {
