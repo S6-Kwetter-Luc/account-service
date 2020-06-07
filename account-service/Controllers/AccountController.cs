@@ -24,12 +24,14 @@ namespace account_service.Controllers
         [HttpPost("authenticate")]
         public async Task<IActionResult> Authenticate([FromBody] AuthenticateModel model)
         {
-            var account = await _accountService.Authenticate(model.Email, model.Password);
-
-            if (account == null)
+            try
+            {
+                return Ok(await _accountService.Authenticate(model.Email, model.Password));
+            }
+            catch (AccountByEmailOrPasswordNotFoundException ex)
+            {
                 return BadRequest(new {message = "Username or password is incorrect"});
-
-            return Ok(account);
+            }
         }
 
         [AllowAnonymous]
