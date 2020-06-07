@@ -33,6 +33,11 @@ namespace account_service.Services
 
         public async Task Follow(Guid id, Guid idToFollow)
         {
+            if (id == idToFollow)
+            {
+                throw new AppException("Cant follow yourself");
+            }
+
             var myProfile = await _repository.GetProfileByGuid(id);
             var profileToFollow = await _repository.GetProfileByGuid(idToFollow);
 
