@@ -10,17 +10,17 @@ namespace account_service_test.Repositories
     public class UserRepositoryTest
     {
         private readonly MongoDbRunner _mongoDbRunner;
-        private readonly IUserRepository _userRepository;
+        private readonly IAccountRepository _accountRepository;
         public UserRepositoryTest(ITestOutputHelper testOutputHelper)
         {
             _mongoDbRunner = MongoDbRunner.Start();
-            var settings = new UserstoreDatabaseSettings
+            var settings = new AccountstoreDatabaseSettings
             {
                 ConnectionString = _mongoDbRunner.ConnectionString,
                 DatabaseName = "IntegrationTest",
-                UserCollectionName = "TestCollection"
+                AccountCollectionName = "TestCollection"
             };
-            _userRepository = new UserRepository(settings);
+            _accountRepository = new AccountRepository(settings);
         }
 
         public void Dispose()

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using account_service.Exceptions;
 using account_service.Models;
 using account_service.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -10,25 +11,27 @@ namespace account_service.Controllers
     [Authorize]
     [ApiController]
     [Route("[controller]")]
-    public class UsersController : ControllerBase
+    public class AccountController : ControllerBase
     {
-        private IUserService _userService;
+        private IAccountService _accountService;
 
-        public UsersController(IUserService userService)
+        public AccountController(IAccountService accountService)
         {
-            _userService = userService;
+            _accountService = accountService;
         }
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
         public async Task<IActionResult> Authenticate([FromBody] AuthenticateModel model)
         {
-            var user = await _userService.Authenticate(model.Email, model.Password);
-
-            if (user == null)
+            try
+            {
+                return Ok(await _accountService.Authenticate(model.Email, model.Password));
+            }
+            catch (AccountByEmailOrPasswordNotFoundException ex)
+            {
                 return BadRequest(new {message = "Username or password is incorrect"});
-
-            return Ok(user);
+            }
         }
 
         [AllowAnonymous]
@@ -38,10 +41,10 @@ namespace account_service.Controllers
             try
             {
                 // create user
-                _userService.Create(model.Name, model.Email, model.Username, model.Password);
+                _accountService.Create(model.Name, model.Email, model.Username, model.Password);
                 return Ok();
             }
-            catch (Exception ex)
+            catch (AlreadyInUseException ex)
             {
                 // return error message if there was an exception
                 return BadRequest(new {message = ex.Message});
@@ -54,7 +57,7 @@ namespace account_service.Controllers
         {
             try
             {
-                return Ok(await _userService.GetUserByGuid(id));
+                return Ok(await _accountService.GetUserByGuid(id));
             }
             catch (Exception ex)
             {
@@ -62,17 +65,17 @@ namespace account_service.Controllers
             }
         }
 
-        [AllowAnonymous]
+        // [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _userService.GetAll());
+            return Ok(await _accountService.GetAll());
         }
 
         [HttpPost("fill")]
         public async Task<IActionResult> Fill()
         {
-            await _userService.Fill();
+            await _accountService.Fill();
             return Ok();
         }
     }

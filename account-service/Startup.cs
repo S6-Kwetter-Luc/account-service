@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -92,14 +93,18 @@ public class Startup
 
             services.AddTransient<ITokenGenerator, TokenGenerator>();
 
-            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IAccountService, AccountService>();
 
-            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IAccountRepository, AccountRepository>();
 
-            services.Configure<UserstoreDatabaseSettings>(Configuration.GetSection(nameof(UserstoreDatabaseSettings)));
+            services.AddTransient<IProfileService, ProfileService>();
 
-            services.AddSingleton<IUserstoreDatabaseSettings>(sp =>
-                sp.GetRequiredService<IOptions<UserstoreDatabaseSettings>>().Value);
+            services.AddTransient<IProfileRepository, ProfileRepository>();
+
+            services.Configure<AccountstoreDatabaseSettings>(Configuration.GetSection(nameof(AccountstoreDatabaseSettings)));
+
+            services.AddSingleton<IAccountstoreDatabaseSettings>(sp =>
+                sp.GetRequiredService<IOptions<AccountstoreDatabaseSettings>>().Value);
 
             services.AddControllers();
         }
