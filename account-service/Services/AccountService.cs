@@ -114,7 +114,7 @@ namespace account_service.Services
         {
             var account = await _repository.GetByGuid(id);
             if (account == null) throw new AccountDoesNotExistException();
-            return account;
+            return account.RemovePassword().RemoveSalt();
         }
 
         public async Task<List<Account>> GetAll()
