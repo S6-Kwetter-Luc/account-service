@@ -89,21 +89,21 @@ namespace account_service_test.Controllers
             Assert.IsType<OkObjectResult>(result);
         }
 
-        [Fact]
-        public async Task Authenticate_Badresult()
-        {
-            var userService = new Mock<IAccountService>();
-            _controller = new AccountController(userService.Object);
-
-            var result = await _controller.Authenticate(new AuthenticateModel()
-            {
-                Email = "test@test.nl",
-                Password = "testtest"
-            });
-
-            _testOutputHelper.WriteLine(result.ToString());
-
-            Assert.IsType<BadRequestObjectResult>(result);
-        }
+        // [Fact]
+        // public async Task Authenticate_Badresult()
+        // {
+        //     var userService = new Mock<IAccountService>();
+        //     _controller = new AccountController(userService.Object);
+        //
+        //     var result = await _controller.Authenticate(new AuthenticateModel()
+        //     {
+        //         Email = "test@test.nl",
+        //         Password = "testtest"
+        //     });
+        //
+        //     _testOutputHelper.WriteLine(result.ToString());
+        //
+        //     Assert.IsType<BadRequestObjectResult>(result);
+        // }
     }
 }
