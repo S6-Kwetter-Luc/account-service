@@ -4,7 +4,12 @@ kind: Ingress
 metadata:
   name: account-service-ingress
   annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-staging-account-service"
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-passthrough: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   rules:
     - host: account.staging.lucurlings.nl
@@ -13,3 +18,7 @@ spec:
           - backend:
               serviceName: account-service
               servicePort: 80
+  tls:
+    - hosts:
+        - account.staging.lucurlings.nl
+      secretName: staging-account-service-kwetter-tls
