@@ -27,11 +27,11 @@ spec:
               scheme: HTTP
             initialDelaySeconds: 15
             periodSeconds: 15
-            readinessProbe:
-              httpGet:
-                path: /ready
-                port: 80
-                scheme: HTTP
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 80
+              scheme: HTTP
               initialDelaySeconds: 15
               periodSeconds: 15
           resources:
