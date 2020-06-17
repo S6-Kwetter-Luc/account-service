@@ -112,7 +112,7 @@ public class Startup
 
             services.AddHealthChecks()
                 .AddCheck("healthy", () => HealthCheckResult.Healthy(), new[] {"healthy"})
-                .AddMongoDb(appSettingsSection.Get<AccountstoreDatabaseSettings>().ConnectionString, tags: new []{"services"})
+                // .AddMongoDb(appSettingsSection.Get<AccountstoreDatabaseSettings>().ConnectionString, tags: new []{"services"})
                 .AddRabbitMQ(new Uri(Configuration["MessageQueueSettings:Uri"]), tags: new[] {"services"});
         }
 
