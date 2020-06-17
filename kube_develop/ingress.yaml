@@ -4,7 +4,7 @@ kind: Ingress
 metadata:
   name: account-service-ingress
   annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-staging-account-service"
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /
