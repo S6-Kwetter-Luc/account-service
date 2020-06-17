@@ -147,17 +147,6 @@ public class Startup
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-
-                // endpoints.MapHealthChecks("/healthy", new HealthCheckOptions()
-                // {
-                //     Predicate = (check) => check.Tags.Contains("healthy"),
-                // });
-                //
-                // endpoints.MapHealthChecks("/ready", new HealthCheckOptions()
-                // {
-                //     Predicate = (check) => check.Tags.Contains("services")
-                // });
-
             });
 
             app.UseHealthChecks("/healthy", new HealthCheckOptions
