@@ -112,7 +112,7 @@ public class Startup
 
             services.AddHealthChecks()
                 .AddCheck("healthy", () => HealthCheckResult.Healthy(), new[] {"healthy"})
-                .AddMongoDb(Configuration["AccountstoreDatabaseSettings:ConnectionString"], tags: new []{"services"})
+                // .AddMongoDb(appSettingsSection.Get<AccountstoreDatabaseSettings>().ConnectionString, tags: new []{"services"})
                 .AddRabbitMQ(new Uri(Configuration["MessageQueueSettings:Uri"]), tags: new[] {"services"});
         }
 
@@ -147,17 +147,16 @@ public class Startup
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
 
-                endpoints.MapHealthChecks("/healthy", new HealthCheckOptions()
-                {
-                    Predicate = (check) => check.Tags.Contains("healthy"),
-                });
+            app.UseHealthChecks("/healthy", new HealthCheckOptions
+            {
+                Predicate = r => r.Tags.Contains("healthy")
+            });
 
-                endpoints.MapHealthChecks("/ready", new HealthCheckOptions()
-                {
-                    Predicate = (check) => check.Tags.Contains("services")
-                });
-
+            app.UseHealthChecks("/ready", new HealthCheckOptions
+            {
+                Predicate = r => r.Tags.Contains("services")
             });
         }
     }
