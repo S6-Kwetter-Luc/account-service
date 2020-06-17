@@ -12,6 +12,8 @@ using account_service.MQSettings;
 using account_service.Repositories;
 using MessageBroker;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
@@ -107,6 +109,11 @@ public class Startup
                 sp.GetRequiredService<IOptions<AccountstoreDatabaseSettings>>().Value);
 
             services.AddControllers();
+
+            services.AddHealthChecks()
+                .AddCheck("healthy", () => HealthCheckResult.Healthy(), new[] {"healthy"})
+                .AddMongoDb(Configuration["AccountstoreDatabaseSettings:ConnectionString"], tags: new []{"services"})
+                .AddRabbitMQ(new Uri(Configuration["MessageQueueSettings:Uri"]), tags: new[] {"services"});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -140,6 +147,17 @@ public class Startup
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+
+                endpoints.MapHealthChecks("/healthy", new HealthCheckOptions()
+                {
+                    Predicate = (check) => check.Tags.Contains("healthy"),
+                });
+
+                endpoints.MapHealthChecks("/ready", new HealthCheckOptions()
+                {
+                    Predicate = (check) => check.Tags.Contains("services")
+                });
+
             });
         }
     }
