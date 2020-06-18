@@ -111,9 +111,9 @@ public class Startup
             services.AddControllers();
 
             services.AddHealthChecks()
-                .AddCheck("healthy", () => HealthCheckResult.Healthy(), new[] {"healthy"});
+                .AddCheck("healthy", () => HealthCheckResult.Healthy(), new[] {"healthy"})
             // .AddMongoDb(appSettingsSection.Get<AccountstoreDatabaseSettings>().ConnectionString, tags: new []{"services"})
-            // .AddRabbitMQ(new Uri(Configuration["MessageQueueSettings:Uri"]), tags: new[] {"services"});
+            .AddRabbitMQ(new Uri(Configuration["MessageQueueSettings:Uri"]), tags: new[] {"services"});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -154,10 +154,10 @@ public class Startup
                 Predicate = r => r.Tags.Contains("healthy")
             });
 
-            // app.UseHealthChecks("/ready", new HealthCheckOptions
-            // {
-            //     Predicate = r => r.Tags.Contains("services")
-            // });
+            app.UseHealthChecks("/ready", new HealthCheckOptions
+            {
+                Predicate = r => r.Tags.Contains("services")
+            });
         }
     }
 }
