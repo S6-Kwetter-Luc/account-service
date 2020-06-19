@@ -71,6 +71,7 @@ jobs:
     needs: [sonarcloud-scan, build]
     runs-on: ubuntu-18.04
     steps:
+      -
       - name: Download release artifact
         uses: actions/download-artifact@v1
         with:
@@ -101,11 +102,13 @@ jobs:
     needs: delivery
     runs-on: ubuntu-18.04
     steps:
+      -
       - name: Download Kubernetes artifact
         uses: actions/download-artifact@v1
         with:
           name: kubernetes-artifact
           path: ./kube
+
       - name: Setup Kubectl
         uses: azure/setup-kubectl@v1
 
