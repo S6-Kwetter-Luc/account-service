@@ -1,11 +1,11 @@
-﻿﻿using System;
- using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using account_service.Entities;
 
 namespace account_service.Services
 {
-    public interface IUserService
+    public interface IAccountService
     {
         // Task Update(User user, string password = null);
         // Task Delete(int id);
@@ -16,7 +16,7 @@ namespace account_service.Services
         /// <param name="email">Email-address of the user</param>
         /// <param name="password">Password of the user</param>
         /// <returns>Authenticated user</returns>
-        Task<User> Authenticate(string email, string password);
+        Task<Account> Authenticate(string email, string password);
 
         /// <summary>
         /// Used to create new users
@@ -26,15 +26,15 @@ namespace account_service.Services
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns>user without password</returns>
-        Task<User> Create(string name, string email, string username, string password);
+        Task<Account> Create(string name, string email, string username, string password);
 
         /// <summary>
         /// Get list of all users
         /// </summary>
         /// <returns>List of all users</returns>
-        Task<List<User>> GetAll();
+        Task<List<Account>> GetAll();
 
-        Task<User> GetUserByGuid(Guid id);
+        Task<Account> GetUserByGuid(Guid id);
 
         /// <summary>
         /// Add 3 new users if the db is empty
