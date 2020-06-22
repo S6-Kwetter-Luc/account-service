@@ -4,18 +4,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using account_service.Entities;
 using account_service.Exceptions;
+using account_service.Helpers;
 using account_service.Repositories;
-using MongoDB.Bson;
 
 namespace account_service.Services
 {
     public class ProfileService : IProfileService
     {
         private readonly IProfileRepository _repository;
+        private readonly IJwtIdClaimReaderHelper _jwtIdClaimReaderHelper;
 
-        public ProfileService(IProfileRepository repository)
+        public ProfileService(IProfileRepository repository, IJwtIdClaimReaderHelper jwtIdClaimReaderHelper)
         {
             _repository = repository;
+            _jwtIdClaimReaderHelper = jwtIdClaimReaderHelper;
         }
 
         public async Task<Profile> GetProfileByGuid(Guid id)
@@ -31,8 +33,13 @@ namespace account_service.Services
             return myProfile.Following.Any(u => u.Id == idToFollow);
         }
 
-        public async Task Follow(Guid id, Guid idToFollow)
+        public async Task Follow(Guid id, Guid idToFollow, string jwt)
         {
+            if (id != _jwtIdClaimReaderHelper.getUserIdFromToken(jwt))
+            {
+                throw new NotAuthenticatedException();
+            }
+
             if (id == idToFollow)
             {
                 throw new AppException("Cant follow yourself");
@@ -66,8 +73,13 @@ namespace account_service.Services
             await _repository.UpdateProfile(idToFollow, profileToFollow);
         }
 
-        public async Task UnFollow(Guid id, Guid idToFollow)
+        public async Task UnFollow(Guid id, Guid idToFollow, string jwt)
         {
+            if (id != _jwtIdClaimReaderHelper.getUserIdFromToken(jwt))
+            {
+                throw new NotAuthenticatedException();
+            }
+
             var myProfile = await _repository.GetProfileByGuid(id);
             var profileToFollow = await _repository.GetProfileByGuid(idToFollow);
 
