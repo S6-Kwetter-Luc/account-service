@@ -103,6 +103,8 @@ public class Startup
 
             services.AddTransient<IProfileRepository, ProfileRepository>();
 
+            services.AddTransient<IJwtIdClaimReaderHelper, JwtIdClaimReaderHelper>();
+
             services.Configure<AccountstoreDatabaseSettings>(Configuration.GetSection(nameof(AccountstoreDatabaseSettings)));
 
             services.AddSingleton<IAccountstoreDatabaseSettings>(sp =>

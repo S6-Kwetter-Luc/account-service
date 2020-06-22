@@ -9,8 +9,8 @@ namespace account_service.Services
     {
         Task<Profile> GetProfileByGuid(Guid id);
         Task<bool> GetFollow(Guid id, Guid idToFollow);
-        Task Follow(Guid id, Guid idToFollow);
-        Task UnFollow(Guid id, Guid idToFollow);
+        Task Follow(Guid id, Guid idToFollow, string jwt);
+        Task UnFollow(Guid id, Guid idToFollow, string jwt);
         Task<List<User>> GetFollowers(Guid id);
         Task<List<User>> GetFollowing(Guid id);
     }
