@@ -1,9 +1,9 @@
-﻿namespace account_service.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace account_service.Models
 {
     public class UpdateModel
     {
-        public string Name { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
+        [Required] public string Username { get; set; }
     }
 }
