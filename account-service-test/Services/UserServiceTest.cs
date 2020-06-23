@@ -5,7 +5,7 @@ using account_service.Exceptions;
 using account_service.Helpers;
 using account_service.Repositories;
 using account_service.Services;
-using account_service.MQSettings;
+using account_service.MQ;
 using MessageBroker;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;

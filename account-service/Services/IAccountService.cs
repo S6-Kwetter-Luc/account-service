@@ -41,5 +41,9 @@ namespace account_service.Services
         /// </summary>
         /// <returns></returns>
         Task Fill();
+
+        Task<Account> UpdateAccount(Guid id, string username, string jwt);
+
+        Task DeleteAccount(Guid id);
     }
 }
