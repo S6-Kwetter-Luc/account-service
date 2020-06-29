@@ -80,13 +80,12 @@ namespace account_service.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("follow")]
-        public async Task<IActionResult> Follow([FromQuery] FollowModel followModel)
+        public async Task<IActionResult> Follow([FromQuery] FollowModel followModel, [FromHeader(Name = "Authorization")] string jwt)
         {
             try
             {
-                await _profileService.Follow(followModel.id, followModel.idToFollow);
+                await _profileService.Follow(followModel.id, followModel.idToFollow, jwt);
                 return Ok();
             }
             catch (Exception ex)
@@ -95,13 +94,12 @@ namespace account_service.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("unfollow")]
-        public async Task<IActionResult> UnFollow([FromQuery] FollowModel followModel)
+        public async Task<IActionResult> UnFollow([FromQuery] FollowModel followModel, [FromHeader(Name = "Authorization")] string jwt)
         {
             try
             {
-                await _profileService.UnFollow(followModel.id, followModel.idToFollow);
+                await _profileService.UnFollow(followModel.id, followModel.idToFollow, jwt);
                 return Ok();
             }
             catch (Exception ex)

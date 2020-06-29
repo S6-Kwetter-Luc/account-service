@@ -65,6 +65,33 @@ namespace account_service.Controllers
             }
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateModel updateModel, [FromHeader(Name = "Authorization")] string jwt)
+        {
+            try
+            {
+                return Ok(await _accountService.UpdateAccount(id, updateModel.Username, jwt));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new {message = ex.Message});
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAccount(Guid id)
+        {
+            try
+            {
+                await _accountService.DeleteAccount(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new {message = ex.Message});
+            }
+        }
+
         // [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()

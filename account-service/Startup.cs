@@ -8,7 +8,8 @@ using account_service.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using account_service.DatastoreSettings;
-using account_service.MQSettings;
+using account_service.MQ;
+using account_service.MQ.Publisher;
 using account_service.Repositories;
 using MessageBroker;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -102,6 +103,10 @@ public class Startup
             services.AddTransient<IProfileService, ProfileService>();
 
             services.AddTransient<IProfileRepository, ProfileRepository>();
+
+            services.AddTransient<IJwtIdClaimReaderHelper, JwtIdClaimReaderHelper>();
+
+            services.AddTransient<IAccountKwetPublisher, AccountKwetPublisher>();
 
             services.Configure<AccountstoreDatabaseSettings>(Configuration.GetSection(nameof(AccountstoreDatabaseSettings)));
 

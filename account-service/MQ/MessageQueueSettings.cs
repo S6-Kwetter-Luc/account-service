@@ -1,4 +1,4 @@
-﻿namespace account_service.MQSettings
+﻿namespace account_service.MQ
 {
     public class MessageQueueSettings
     {
